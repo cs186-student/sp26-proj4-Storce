@@ -4,12 +4,22 @@ package edu.berkeley.cs186.database.concurrency;
  * Utility methods to track the relationships between different lock types.
  */
 public enum LockType {
-    S,   // shared
-    X,   // exclusive
-    IS,  // intention shared
-    IX,  // intention exclusive
+    S, // shared
+    X, // exclusive
+    IS, // intention shared
+    IX, // intention exclusive
     SIX, // shared intention exclusive
-    NL;  // no lock held
+    NL; // no lock held
+
+    private static final boolean[][] COMPATIBILITY_MATRIX = {
+            // S X IS IX SIX NL
+            /* S */ { true, false, true, false, false, true },
+            /* X */ { false, false, false, false, false, true },
+            /* IS */ { true, false, true, true, true, true },
+            /* IX */ { false, false, true, true, false, true },
+            /* SIX */ { false, false, true, false, false, true },
+            /* NL */ { true, true, true, true, true, true }
+    };
 
     /**
      * This method checks whether lock types A and B are compatible with
@@ -21,9 +31,56 @@ public enum LockType {
         if (a == null || b == null) {
             throw new NullPointerException("null lock type");
         }
-        // TODO(proj4_part1): implement
 
-        return false;
+        int a_index;
+        switch (a) {
+            case S:
+                a_index = 0;
+                break;
+            case X:
+                a_index = 1;
+                break;
+            case IS:
+                a_index = 2;
+                break;
+            case IX:
+                a_index = 3;
+                break;
+            case SIX:
+                a_index = 4;
+                break;
+            case NL:
+                a_index = 5;
+                break;
+            default:
+                throw new UnsupportedOperationException("bad lock type");
+        }
+
+        int b_index;
+        switch (b) {
+            case S:
+                b_index = 0;
+                break;
+            case X:
+                b_index = 1;
+                break;
+            case IS:
+                b_index = 2;
+                break;
+            case IX:
+                b_index = 3;
+                break;
+            case SIX:
+                b_index = 4;
+                break;
+            case NL:
+                b_index = 5;
+                break;
+            default:
+                throw new UnsupportedOperationException("bad lock type");
+        }
+
+        return COMPATIBILITY_MATRIX[a_index][b_index];
     }
 
     /**
@@ -35,25 +92,32 @@ public enum LockType {
             throw new NullPointerException("null lock type");
         }
         switch (a) {
-        case S: return IS;
-        case X: return IX;
-        case IS: return IS;
-        case IX: return IX;
-        case SIX: return IX;
-        case NL: return NL;
-        default: throw new UnsupportedOperationException("bad lock type");
+            case S:
+                return IS;
+            case X:
+                return IX;
+            case IS:
+                return IS;
+            case IX:
+                return IX;
+            case SIX:
+                return IX;
+            case NL:
+                return NL;
+            default:
+                throw new UnsupportedOperationException("bad lock type");
         }
     }
 
     /**
-     * This method returns if parentLockType has permissions to grant a childLockType
+     * This method returns if parentLockType has permissions to grant a
+     * childLockType
      * on a child.
      */
     public static boolean canBeParentLock(LockType parentLockType, LockType childLockType) {
         if (parentLockType == null || childLockType == null) {
             throw new NullPointerException("null lock type");
         }
-        // TODO(proj4_part1): implement
 
         return false;
     }
@@ -83,14 +147,20 @@ public enum LockType {
     @Override
     public String toString() {
         switch (this) {
-        case S: return "S";
-        case X: return "X";
-        case IS: return "IS";
-        case IX: return "IX";
-        case SIX: return "SIX";
-        case NL: return "NL";
-        default: throw new UnsupportedOperationException("bad lock type");
+            case S:
+                return "S";
+            case X:
+                return "X";
+            case IS:
+                return "IS";
+            case IX:
+                return "IX";
+            case SIX:
+                return "SIX";
+            case NL:
+                return "NL";
+            default:
+                throw new UnsupportedOperationException("bad lock type");
         }
     }
 }
-
